@@ -1,7 +1,6 @@
 let routes = require('express').Router();
-let githubApi = require('../services/githubApi');
-
-const SIZE = 100;
+const { response } = require('express');
+const getResponseDataPerPage = require('../services/getReponseDataPerPage.js');
 
 routes.get('/', (req, res) => {
     return res.json({
@@ -17,20 +16,12 @@ routes.get('/repositories/:name', async (req, res) => {
     let page = 1;
     let repositories = [];
 
-    while (page > 0) {
-        try {
-            let response = await githubApi.get(`/orgs/${ornanization}/repos?page=${page}&per_page=${SIZE}`);
-            let data = response.data
-            data.forEach(repo => repositories.push(repo.name));
-            page++;
-            console.log(data.length)
-            if(data.length < SIZE) page = 0;
-        }
-        catch (error) {
-            console.log(error);
-            page = 0;
-        }
-    }
+    //Geting repositories list
+    let response = await getResponseDataPerPage(`/orgs/${ornanization}/repos`);
+    response.forEach(repo=>{
+        console.log(repo.name)
+        repositories.push(repo.name)
+    })
 
     return res.json(repositories);
     
