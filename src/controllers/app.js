@@ -12,37 +12,56 @@ routes.get('/', (req, res) => {
     })
 })
 
-routes.get('/repositories/:name', async (req, res) => {
+routes.get('/repositories/:name', (req, res) => {
     const start = Date.now();
     let ornanization = req.params.name;
-    let page = 1;
     let repositories = [];
+    let result = []
 
     //Geting repositories list
-    let response = await getResponseDataPerPage(`/orgs/${ornanization}/repos`);
-    response.forEach(repo=>{
-        repositories.push(repo.name)
-    });
+    getResponseDataPerPage(`/orgs/${ornanization}/repos`).then(response => {
+        response.forEach(repo => {
+            repositories.push(repo.name)
+            //console.log(repo.name);
 
-    //Geting stars in repositories
-    const promisses = repositories.map(async (repo)=>{
-        let stars = await getResponseDataPerPage(`/repos/${ornanization}/${repo}/stargazers`);
-        let json = {
-            name: repo,
-            stars: stars.length
-        }
-      
-        return json;
+        });
+        //Geting stars in repositories
+        const promisses = repositories.map((repo) => {
+            return getResponseDataPerPage(`/repos/${ornanization}/${repo}/stargazers`).then(stars => {
+                let json = {
+                    name: repo,
+                    stars: stars.length
+                }
+
+                return json;
+            }).catch(error=>{
+                console.log("<<<<<<<<=============================Parou AQUI===================>>>>>>>")
+            })
+        })
+
+        result = [];
+
+        Promise.all(promisses).then(result => {
+            result = result.sort((a, b) => { return b.stars - a.stars })
+            console.log("Result:")
+            result.forEach(item => { console.log(item) });
+
+            console.log("Repositories: ", repositories.length)
+            console.log(Date.now() - start);
+
+            return res.status(200).json({ result });
+        }).catch(error=>{
+            console.log(">>>>>>>>>>>>>>>>><<<<<<<<<<<<AQUI NO APP/PROMISES ALL<<<<<<<<<<<<<<<>>>>>>>>>>>>")
+        })
+
+
+    }).catch(error => {
+        console.log(">>>>>>>>>>>>>ERROR NO APP<<<<<<<<<<<<<");
+        console.log(error);
+        return res.status(400).send('{error:error.code}');
     })
 
-    let result = await Promise.all(promisses)
-    
-    console.log("Result:")
-    result.forEach(item=>{console.log(item)});
-    
-    console.log(Date.now() - start);
-    return res.json(result);
-    
+
 })
 
 module.exports = routes;
