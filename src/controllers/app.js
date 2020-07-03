@@ -11,6 +11,7 @@ routes.get('/', (req, res) => {
 })
 
 routes.get('/repositories/:name', (req, res) => {
+    req.setTimeout(10*60*1000)
     const start = Date.now();
     let ornanization = req.params.name;
 
