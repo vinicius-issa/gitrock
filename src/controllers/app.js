@@ -1,7 +1,5 @@
 let routes = require('express').Router();
-const { response } = require('express');
-const getResponseDataPerPage = require('../services/getReponseDataPerPage.js');
-
+const {getRepos, getStars} = require('../services/responses');
 
 routes.get('/', (req, res) => {
     return res.json({
@@ -15,43 +13,30 @@ routes.get('/', (req, res) => {
 routes.get('/repositories/:name', (req, res) => {
     const start = Date.now();
     let ornanization = req.params.name;
-    let repositories = [];
-    let result = []
 
     //Geting repositories list
-    getResponseDataPerPage(`/orgs/${ornanization}/repos`).then(response => {
-        response.forEach(repo => {
-            repositories.push(repo.name)
-            //console.log(repo.name);
-
-        });
-        //Geting stars in repositories
-        const promisses = repositories.map((repo) => {
-            return getResponseDataPerPage(`/repos/${ornanization}/${repo}/stargazers`).then(stars => {
-                let json = {
-                    name: repo,
-                    stars: stars.length
+    getRepos(`/orgs/${ornanization}/repos`).then(repositories => {
+        console.log('Respos Size:',repositories.length);
+        let promises = []
+        repositories.forEach(repo=>{
+            let url = `/repos/${ornanization}/${repo.name}/stargazers`;
+            console.log("Add no promisses array:", url);
+            promises.push(getStars(url).then(stars=>{
+                console.log("Resolvida a url:",url);
+                return {
+                    name: repo.name,
+                    stars
                 }
-
-                return json;
-            }).catch(error=>{
-                console.log("<<<<<<<<=============================Parou AQUI===================>>>>>>>")
-            })
+            }))
         })
-
-        result = [];
-
-        Promise.all(promisses).then(result => {
-            result = result.sort((a, b) => { return b.stars - a.stars })
-            console.log("Result:")
-            result.forEach(item => { console.log(item) });
-
-            console.log("Repositories: ", repositories.length)
-            console.log(Date.now() - start);
-
-            return res.status(200).json({ result });
+        Promise.all(promises).then(result=>{
+            result = result.sort((a,b)=>(b.stars - a.stars))
+            console.log(result);
+            console.log("TEMPOS: ", Date.now() - start)
+            res.json(result);
         }).catch(error=>{
-            console.log(">>>>>>>>>>>>>>>>><<<<<<<<<<<<AQUI NO APP/PROMISES ALL<<<<<<<<<<<<<<<>>>>>>>>>>>>")
+            console.log("PEGAMOS O ERRO AQUI<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            return res.status(400).send("ERROR");
         })
 
 
