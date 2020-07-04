@@ -33,7 +33,9 @@ const getRepos = urlBase =>{
                             result.push(...data);
                         }
                         else{
+                            isError = true;
                             console.log("Tivemos um problema aqui... conferir <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+                            console.log(el.error)
                             getRepos(urlBase).then(repos=>{
                                 resolve(repos);
                             })
@@ -44,9 +46,27 @@ const getRepos = urlBase =>{
                     }
                 })
             }else{
-                getRepos(urlBase).then(repos=>{
-                    resolve(repos);
-                })
+                let message = 'no message error'
+                if(resp.error.response && resp.error.response.data)
+                    message = resp.error.response.data.message
+                console.log("Error Message:", message);
+                if( message.includes('API rate limit exceeded for user')){
+                    console.log("Rject")
+                    reject(resp.error)
+                }
+                else if (message.includes('You have triggered an abuse detection mechanism.')){
+                    setTimeout(()=>{
+                        getRepos(urlBase).then(repos=>{
+                            resolve(repos);
+                        })
+                    },5000)
+                }
+                else{
+                    getRepos(urlBase).then(repos=>{
+                        resolve(repos);
+                    })
+                }
+                
             }
         })
     })
@@ -73,6 +93,7 @@ const getStars = urlRepo =>{
                         }
                         else {
                             console.log(">>>>>>>>>>>>>>>ALgum problem aqui cara<<<<<<<<<<<<<<<")
+                            console.log("nessa url: ",urlRepo)
                             getStars(urlRepo).then(star=>{
                                 resolve(star);
                             })
@@ -82,10 +103,29 @@ const getStars = urlRepo =>{
             }
             else{
                 console.log("Erro no AXIOS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                console.log('URL DO ERRO:', urlRepo);
-                getStars(urlRepo).then(star=>{
-                    resolve(star)
-                })
+                let message = 'no message error'
+                if(resp.error.response && resp.error.response.data){
+                    message = resp.error.response.data.message
+                }
+                console.log('Error MEssage: ', message);
+                if( message.includes('API rate limit exceeded for user')){
+                    console.log("Rject")
+                    reject(resp.error)
+                }
+                else if (message.includes('You have triggered an abuse detection mechanism.')){
+                    setTimeout(()=>{
+                        getStars(urlRepo).then(star=>{
+                            resolve(star)
+                        })
+                    },5000)
+                }
+                else{
+                    console.log('URL DO ERRO:', urlRepo);
+                    console.log('Error Msg', resp.error.code )
+                    getStars(urlRepo).then(star=>{
+                        resolve(star)
+                    })
+                }
 
             }
         })

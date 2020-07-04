@@ -11,13 +11,13 @@ routes.get('/', (req, res) => {
 })
 
 routes.get('/repositories/:name', (req, res) => {
-    req.setTimeout(10*60*1000)
+    req.setTimeout(20*60*1000)
     const start = Date.now();
     let ornanization = req.params.name;
 
     //Geting repositories list
     getRepos(`/orgs/${ornanization}/repos`).then(repositories => {
-        console.log('Respos Size:',repositories.length);
+        
         let promises = []
         repositories.forEach(repo=>{
             let url = `/repos/${ornanization}/${repo.name}/stargazers`;
@@ -28,12 +28,15 @@ routes.get('/repositories/:name', (req, res) => {
                     name: repo.name,
                     stars
                 }
-            }))
+            }).catch(error=>{
+                return res.status(400).json(error);
+            }));
         })
         Promise.all(promises).then(result=>{
             result = result.sort((a,b)=>(b.stars - a.stars))
             console.log(result);
             console.log("TEMPOS: ", Date.now() - start)
+            console.log('Respos Size:',repositories.length);
             res.json(result);
         }).catch(error=>{
             console.log("PEGAMOS O ERRO AQUI<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
@@ -44,7 +47,8 @@ routes.get('/repositories/:name', (req, res) => {
     }).catch(error => {
         console.log(">>>>>>>>>>>>>ERROR NO APP<<<<<<<<<<<<<");
         console.log(error);
-        return res.status(400).send('{error:error.code}');
+        return res.status(400).json(error);
+
     })
 
 
