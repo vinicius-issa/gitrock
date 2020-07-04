@@ -15,13 +15,11 @@ const getRepos = urlBase =>{
         let url = `${urlBase}?page=1&per_page=100`
         githubApi.get(urlBase).then(resp=>{
             if(resp.status===200){
-                console.log("STATUS EH 200");
                 let response= resp.response;
                 let lastPage = getLastPage(response);
                 let promises = []
                 for(let i=1; i<=lastPage ; i++){
                     let urlPromise = `${urlBase}?page=${i}&per_page=100`
-                    console.log(urlPromise);
                     promises.push(githubApi.get(urlPromise));
                 }
                 Promise.all(promises).then(results=>{
@@ -34,7 +32,7 @@ const getRepos = urlBase =>{
                         }
                         else{
                             isError = true;
-                            console.log("Tivemos um problema aqui... conferir <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+                            console.log("A error was ocurred in requisition")
                             console.log(el.error)
                             getRepos(urlBase).then(repos=>{
                                 resolve(repos);
@@ -49,9 +47,9 @@ const getRepos = urlBase =>{
                 let message = 'no message error'
                 if(resp.error.response && resp.error.response.data)
                     message = resp.error.response.data.message
-                console.log("Error Message:", message);
+                console.log("Error Message:", resp.error);
                 if( message.includes('API rate limit exceeded for user')){
-                    console.log("Rject")
+                    console.log("The app will terminate")
                     reject(resp.error)
                 }
                 else if (message.includes('You have triggered an abuse detection mechanism.')){
@@ -75,12 +73,10 @@ const getRepos = urlBase =>{
 const getStars = urlRepo =>{
     return new Promise((resolve,reject)=>{
         let urlFirst = `${urlRepo}?page=1&per_page=100`
-        console.log('GetStars->urlFirst:', urlFirst);
         githubApi.get(urlFirst).then(resp=>{
             if(resp.status===200){
                 let response = resp.response;
                 let lastPage = getLastPage(response);
-                console.log('GetStars->lastUrl:', lastPage);
                 if(lastPage===1)
                     resolve(response.data.length);
                 else{
@@ -92,8 +88,8 @@ const getStars = urlRepo =>{
                             resolve(100*(lastPage-1) + sizeLast)
                         }
                         else {
-                            console.log(">>>>>>>>>>>>>>>ALgum problem aqui cara<<<<<<<<<<<<<<<")
-                            console.log("nessa url: ",urlRepo)
+                            console.log("A error was ocurred in requisition")
+                            console.log("in url: ",urlRepo)
                             getStars(urlRepo).then(star=>{
                                 resolve(star);
                             })
@@ -102,14 +98,14 @@ const getStars = urlRepo =>{
                 }
             }
             else{
-                console.log("Erro no AXIOS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                console.log("A error was ocurred in requisition")
                 let message = 'no message error'
                 if(resp.error.response && resp.error.response.data){
                     message = resp.error.response.data.message
                 }
-                console.log('Error MEssage: ', message);
+                console.log('Error Message: ', message);
                 if( message.includes('API rate limit exceeded for user')){
-                    console.log("Rject")
+                    console.log("The app will terminate")
                     reject(resp.error)
                 }
                 else if (message.includes('You have triggered an abuse detection mechanism.')){
@@ -120,7 +116,7 @@ const getStars = urlRepo =>{
                     },5000)
                 }
                 else{
-                    console.log('URL DO ERRO:', urlRepo);
+                    console.log("in url: ",urlRepo)
                     console.log('Error Msg', resp.error.code )
                     getStars(urlRepo).then(star=>{
                         resolve(star)

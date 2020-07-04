@@ -21,9 +21,7 @@ routes.get('/repositories/:name', (req, res) => {
         let promises = []
         repositories.forEach(repo=>{
             let url = `/repos/${ornanization}/${repo.name}/stargazers`;
-            console.log("Add no promisses array:", url);
             promises.push(getStars(url).then(stars=>{
-                console.log("Resolvida a url:",url);
                 return {
                     name: repo.name,
                     stars
@@ -35,17 +33,16 @@ routes.get('/repositories/:name', (req, res) => {
         Promise.all(promises).then(result=>{
             result = result.sort((a,b)=>(b.stars - a.stars))
             console.log(result);
-            console.log("TEMPOS: ", Date.now() - start)
-            console.log('Respos Size:',repositories.length);
             res.json(result);
         }).catch(error=>{
-            console.log("PEGAMOS O ERRO AQUI<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-            return res.status(400).send("ERROR");
+            console.log("A error was ocurred");
+            console.log(error);
+            return res.status(400).json(error);
         })
 
 
     }).catch(error => {
-        console.log(">>>>>>>>>>>>>ERROR NO APP<<<<<<<<<<<<<");
+        console.log("A error was ocurred");
         console.log(error);
         return res.status(400).json(error);
 
