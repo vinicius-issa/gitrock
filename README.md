@@ -32,6 +32,17 @@ Caso deseja utilizar uma chave de acesso, basta criar um arquivo ```.env``` na r
 TOKEN=<seu_token>
 ``` 
 
+### Utilizando o Docker
+Esse sistema já esta configurado para rodar com o docker. Para isso, construa a imagem com:
+```
+docker build -t gitrock
+```
+E depois basta rodar com:
+```
+docker run --name gitrock -p 3000:3000 -d gitrock
+```
+
+
 ### Framework e Bibliotecas Utilizadas
 * **express** Por possuir maior conhecimento em como utilizar e sobre o funcionamento do mesmo, optei por utilizar o express como framework para o node
 * **axios** para as requisições à API do Github. Optei pela facilidade de se trabalhar com promises
@@ -48,3 +59,4 @@ Tudo isso acreditando que era algum problema no Axios. Porem, o problema era sim
 
 Outro ponto foi na tentativa de uso de cache nas chamadas do Axios utilizando o Redis para armazenamento. Tentei por aproximadamente 6h essa integração, porem sem sucesso. Continuarei tentando implementar a funcionalidade de cache para o sistema.
 
+O sistema não esta retornando o valor correto para o repositório *expressjs/express* devido ao modelo de contagem das *stars*. A API do GitHub permite avançar até a página 400, não retornando valor após essa. Com isso, é retornado o valor de 40.000 stars para esse repositório, quando deveria retornar 49.191. Não encontrei outra maneira de resolver esse problema específico sem utilizar o stargazer_count. Com isso, nenhuma resolução foi implementada para esse caso.
