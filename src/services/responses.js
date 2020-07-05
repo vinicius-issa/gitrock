@@ -48,7 +48,7 @@ const getRepos = urlBase =>{
                 if(resp.error.response && resp.error.response.data)
                     message = resp.error.response.data.message
                 console.log("Error Message:", resp.error);
-                if( message.includes('API rate limit exceeded for user')){
+                if( message.includes('API rate limit exceeded for')){
                     console.log("The app will terminate")
                     reject(resp.error)
                 }
@@ -104,7 +104,7 @@ const getStars = urlRepo =>{
                     message = resp.error.response.data.message
                 }
                 console.log('Error Message: ', message);
-                if( message.includes('API rate limit exceeded for user')){
+                if( message.includes('API rate limit exceeded for')){
                     console.log("The app will terminate")
                     reject(resp.error)
                 }
@@ -128,4 +128,4 @@ const getStars = urlRepo =>{
     })
 }
 
-module.exports = {getRepos, getStars};
+module.exports = {getRepos, getStars, getLastPage};
