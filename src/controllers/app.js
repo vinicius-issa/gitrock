@@ -1,5 +1,6 @@
 let routes = require('express').Router();
 const {getRepos, getStars} = require('../services/responses');
+const myCache = require('../services/cache');
 
 routes.get('/', (req, res) => {
     return res.json({
@@ -13,14 +14,18 @@ routes.get('/', (req, res) => {
 routes.get('/repositories/:name', (req, res) => {
     req.setTimeout(20*60*1000)
     const start = Date.now();
-    let ornanization = req.params.name;
+    let organization = req.params.name;
+
+    let inCache = myCache.get(organization);
+    if(inCache)
+        return res.json(inCache);
 
     //Geting repositories list
-    getRepos(`/orgs/${ornanization}/repos`).then(repositories => {
+    getRepos(`/orgs/${organization}/repos`).then(repositories => {
         
         let promises = []
         repositories.forEach(repo=>{
-            let url = `/repos/${ornanization}/${repo.name}/stargazers`;
+            let url = `/repos/${organization}/${repo.name}/stargazers`;
             promises.push(getStars(url).then(stars=>{
                 return {
                     name: repo.name,
@@ -33,7 +38,8 @@ routes.get('/repositories/:name', (req, res) => {
         Promise.all(promises).then(result=>{
             result = result.sort((a,b)=>(b.stars - a.stars))
             console.log(result);
-            res.json(result);
+            myCache.set(organization,result);
+            return res.json(result);
         }).catch(error=>{
             console.log("A error was ocurred");
             console.log(error);

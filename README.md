@@ -49,6 +49,7 @@ docker run --name gitrock -p 3000:3000 -d gitrock
 * **dotenv** para armazenamento das variaveis de ambiente.
 * **jest** para execução dos testes
 * **supertest** para os testes de rotas, utilizando para as chamadas à nossa API
+* **node-cache** para a implantação do cache no sistema. Essa é uma das lib mais utilizadas para node ao que se refere ao uso de cache.
 
 ### Dificuldades encontradas
 Durante o desenvolvimento do sistema, algumas dificuldades foram encontradas, o que ocasionaram um tempo de entrega mais longo do que o esperado por mim. 
@@ -57,6 +58,7 @@ O primeiro problema foi com o timeout padrão das requisicoes do express. O Fram
 Com isso, tentei solucionar o problema da resposta vazia procurando algum problema com o Axios. Refatorei o codigo diversas vezes, incluindo os interceptadores nas requisições do Axios para remover os retornos de Promises rejeitadas pela lib, removi todos os awaits e funções assincronas e também cheguei a incluir as chamadas recursivas para as requisições rejeitadas até que fossem realizadas com sucesso.
 Tudo isso acreditando que era algum problema no Axios. Porem, o problema era simplesmente o timeout padrão do Express... Isso me custou cerca de 12h de desenvolvimento.
 
-Outro ponto foi na tentativa de uso de cache nas chamadas do Axios utilizando o Redis para armazenamento. Tentei por aproximadamente 6h essa integração, porem sem sucesso. Continuarei tentando implementar a funcionalidade de cache para o sistema.
+Outro ponto foi na tentativa de uso de cache nas chamadas do Axios utilizando o Redis para armazenamento. Tentei por aproximadamente 6h essa integração, porem sem sucesso. 
+Depois do sistema finalizado, subi uma atualização utilizando a lib *node-cache*, funcionando corretamente e permitindo assim a utilização de cache no sistema.
 
 O sistema não esta retornando o valor correto para o repositório *expressjs/express* devido ao modelo de contagem das *stars*. A API do GitHub permite avançar até a página 400, não retornando valor após essa. Com isso, é retornado o valor de 40.000 stars para esse repositório, quando deveria retornar 49.191. Não encontrei outra maneira de resolver esse problema específico sem utilizar o stargazer_count. Com isso, nenhuma resolução foi implementada para esse caso.
