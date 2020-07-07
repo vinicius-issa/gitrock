@@ -5,7 +5,7 @@
   "main": "src/loader.js",
   "scripts": {
     "dev": "nodemon",
-    "production": "pm2 start src/loader.js --name git-rock",
+    "production": "pm2-runtime start src/loader.js --name git-rock --env production",
     "test": "NODE_ENV=TEST jest"
   },
   "author": "Vinicius Issa",
@@ -22,5 +22,8 @@
   "devDependencies": {
     "jest": "^26.1.0",
     "supertest": "^4.0.2"
+  },
+    "engines": {
+      "node": "12.16.1"
   }
 }

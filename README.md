@@ -51,6 +51,11 @@ docker run --name gitrock -p 3000:3000 -d gitrock
 * **supertest** para os testes de rotas, utilizando para as chamadas à nossa API
 * **node-cache** para a implantação do cache no sistema. Essa é uma das lib mais utilizadas para node ao que se refere ao uso de cache.
 
+### Deploy com Heroku
+Essa aplicação se encontra online, para acessa-la, [clique aqui](https://gitrock.herokuapp.com).
+Para as requisições, acesse /repositories/<nome_do_repositorio>
+
+
 ### Dificuldades encontradas
 Durante o desenvolvimento do sistema, algumas dificuldades foram encontradas, o que ocasionaram um tempo de entrega mais longo do que o esperado por mim. 
 
@@ -62,3 +67,6 @@ Outro ponto foi na tentativa de uso de cache nas chamadas do Axios utilizando o 
 Depois do sistema finalizado, subi uma atualização utilizando a lib *node-cache*, funcionando corretamente e permitindo assim a utilização de cache no sistema.
 
 O sistema não esta retornando o valor correto para o repositório *expressjs/express* devido ao modelo de contagem das *stars*. A API do GitHub permite avançar até a página 400, não retornando valor após essa. Com isso, é retornado o valor de 40.000 stars para esse repositório, quando deveria retornar 49.191. Não encontrei outra maneira de resolver esse problema específico sem utilizar o stargazer_count. Com isso, nenhuma resolução foi implementada para esse caso.
+
+### Próximas features
+Pretendo remover as chamadas recursivas, a fim de economizar memória.
